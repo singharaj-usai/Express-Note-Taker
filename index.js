@@ -18,12 +18,12 @@ app.use(express.urlencoded({extended: true}));
 
 // Homepage Route
 app.get('/', (req, res) =>
-    res.render(path.join(__dirname, "public/index"))
+    res.sendFile(path.join(__dirname, "public/index.html"))
 );
 
 // Notes Route
-app.get('/', (req, res) =>
-    res.render(path.join(__dirname, "public/notes"))
+app.get('/notes', (req, res) =>
+    res.sendFile(path.join(__dirname, "public/notes.html"))
 );
 
 // POST request to add a note
@@ -53,16 +53,18 @@ app.post('/api/notes', (req, res) => {
             `Review for ${newNote.title} has been written to JSON file`
           )
     );
+    readAndAppend(newNote, './db/db.json');
+    
       const response = {
         status: 'success',
         response: newNote
       };
   
       console.log(response);
-      res.status(201).json(response);
-    } else {
-      res.status(500).json('Error in posting notes');
-    }
+    res.json(response);
+  } else {
+    res.json('Error in posting note');
+  }
   });
 
 // Server Start
