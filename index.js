@@ -26,10 +26,20 @@ app.get('/notes', (req, res) =>
     res.sendFile(path.join(__dirname, "public/notes.html"))
 );
 
-// POST request to add a note
-app.post('/api/notes', (req, res) => {
+
+// GET request for reviews
+ //   app.get('/api/notes', (req, res) => {
+    // Send a message to the client
+//    res.status(200).json(`${req.method} request received to get reviews`);
+
+    // Log our request to the terminal
+//    console.info(`${req.method} request received to get reviews`);
+//  });
+  
+  // POST request to add a review
+  app.post('/api/notes', (req, res) => {
     // Log that a POST request was received
-    console.info(`${req.method} request received to add a note`);
+    console.info(`${req.method} request received to add a review`);
   
     // Destructuring assignment for the items in req.body
     const { title, text } = req.body;
@@ -42,29 +52,40 @@ app.post('/api/notes', (req, res) => {
         text,
       };
   
-          // Convert the data to a string so we can save it
-    const noteString = JSON.stringify(newNote);
-
-      // Write the string to a file
-      fs.writeFile(`./db/${newNote.title}.json`, noteString, (err) =>
-      err
-        ? console.error(err)
-        : console.log(
-            `Review for ${newNote.title} has been written to JSON file`
-          )
-    );
-    readAndAppend(newNote, './db/db.json');
-    
+      // Obtain existing reviews
+      fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if (err) throw err;
+       
+          // Convert string into JSON object
+          const parsedReviews = JSON.parse(data);
+  
+          // Add a new review
+          parsedReviews.push(newNote);
+  
+          // Write updated reviews back to the file
+          fs.writeFile(
+            './db/db.json',
+            JSON.stringify(parsedReviews, null, 4),
+            (writeErr) =>
+              writeErr
+                ? console.error(writeErr)
+                : console.info('Successfully updated reviews!')
+          );
+        app.get('/api/notes', function(req, res){
+            res.json(parsedReviews)
+        })
+      });
+  
       const response = {
         status: 'success',
-        response: newNote
+        body: newNote,
       };
   
       console.log(response);
-    res.json(response);
-  } else {
-    res.json('Error in posting note');
-  }
+      res.status(201).json(response);
+    } else {
+      res.status(500).json('Error in posting review');
+    }
   });
 
 // Server Start
