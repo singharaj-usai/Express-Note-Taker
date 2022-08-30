@@ -74,6 +74,12 @@ app.get('/notes', (req, res) =>
         app.get('/api/notes', function(req, res){
             res.json(parsedReviews)
         })
+        
+        app.delete('/api/notes', function(req, res){
+            parsedReviews.splice()
+            res.json(parsedReviews)
+        })
+
       });
   
       const response = {
